@@ -5,6 +5,10 @@
 	<artifactId>yaml-storm-builder</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<properties>
+		<skip.sign>true</skip.sign>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.yaml</groupId>
@@ -59,6 +63,23 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<skip>${skip.sign}</skip>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
