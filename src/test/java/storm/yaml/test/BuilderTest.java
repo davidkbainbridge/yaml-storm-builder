@@ -31,10 +31,13 @@
  */
 package storm.yaml.test;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import storm.yaml.configuration.YamlTopologyBuilder;
+import storm.yaml.YamlTopologyBuilder;
 import backtype.storm.generated.StormTopology;
 
 /**
@@ -44,9 +47,45 @@ import backtype.storm.generated.StormTopology;
 
 public class BuilderTest {
 	@Test
-	public void BuildTopologyTest() {
+	public void BuildTopologyFromResourceTest() {
 		StormTopology topo = new YamlTopologyBuilder("SampleTopo.yml")
 				.createTopology();
+
+		Assert.assertEquals(1, topo.get_spouts_size());
+		Assert.assertEquals(2, topo.get_bolts_size());
+		Assert.assertTrue(topo.get_spouts().containsKey("random"));
+		Assert.assertTrue(topo.get_bolts().containsKey("multiply_bolt"));
+		Assert.assertTrue(topo.get_bolts().containsKey("log_bolt"));
+		Assert.assertEquals(1, topo.get_bolts().get("multiply_bolt")
+				.get_common().get_inputs_size());
+		Assert.assertEquals("random", topo.get_bolts().get("multiply_bolt")
+				.get_common().get_inputs().keySet().iterator().next()
+				.get_componentId());
+		Assert.assertNotNull(topo.get_bolts().get("multiply_bolt").get_common()
+				.get_inputs().values().iterator().next().get_shuffle());
+		Assert.assertEquals(1, topo.get_bolts().get("log_bolt").get_common()
+				.get_inputs_size());
+		Assert.assertEquals("multiply_bolt", topo.get_bolts().get("log_bolt")
+				.get_common().get_inputs().keySet().iterator().next()
+				.get_componentId());
+		Assert.assertNotNull(topo.get_bolts().get("log_bolt").get_common()
+				.get_inputs().values().iterator().next().get_shuffle());
+	}
+
+	@Test
+	public void BuildTopologyFromInputStreamTest() {
+		StormTopology topo = null;
+		InputStream is = null;
+		try {
+			is = ClassLoader.getSystemResourceAsStream("SampleTopo.yml");
+			topo = new YamlTopologyBuilder(is).createTopology();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				Assert.fail(e.getMessage());
+			}
+		}
 
 		Assert.assertEquals(1, topo.get_spouts_size());
 		Assert.assertEquals(2, topo.get_bolts_size());

@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration;
+package storm.yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import storm.yaml.configuration.BoltSpecification;
+import storm.yaml.configuration.SpoutSpecification;
+import storm.yaml.configuration.TopologySpecification;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.IRichBolt;
@@ -56,12 +59,24 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 			.getLogger(TopologyBuilder.class);
 
 	private final String yamlSpecification;
+	private final InputStream yamlStream;
 
 	public YamlTopologyBuilder(String yamlSpecification) {
 		this.yamlSpecification = yamlSpecification;
+		this.yamlStream = null;
+	}
+	
+	public YamlTopologyBuilder(InputStream yamlStream) {
+		this.yamlStream = yamlStream;
+		this.yamlSpecification = null;
 	}
 
 	private InputStream findInputStream() {
+		
+		if (yamlStream != null) {
+			return yamlStream;
+		}
+		
 		InputStream is = null;
 
 		// First attempt to see if it is a resource file
