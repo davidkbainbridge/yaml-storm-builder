@@ -51,8 +51,10 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
 /**
- * @author David Bainbridge <davidk.bainbridge@gmail.com>
+ * Apache Storm TopologyBuilder that constructs the topology from a YAML file
+ * that specifies the topology components and their connections.
  * 
+ * @author David Bainbridge <davidk.bainbridge@gmail.com>
  */
 public class YamlTopologyBuilder extends TopologyBuilder {
 	private static final Logger log = LoggerFactory
@@ -61,22 +63,45 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 	private final String yamlSpecification;
 	private final InputStream yamlStream;
 
+	/**
+	 * Constructs a topology builder that will construct the topology based on
+	 * the specified system resource or file
+	 * 
+	 * @param yamlSpecification
+	 *            specifies a system resource or file name that is the YAML file
+	 *            definition of the topology
+	 */
 	public YamlTopologyBuilder(String yamlSpecification) {
 		this.yamlSpecification = yamlSpecification;
 		this.yamlStream = null;
 	}
-	
+
+	/**
+	 * Constructs a topology builder that will construct the topology based on
+	 * the specification in the YAML InputStream
+	 * 
+	 * @param yamlStream
+	 *            specifies an {@see InputStream} that contains the YAML
+	 *            definition of the topology
+	 */
 	public YamlTopologyBuilder(InputStream yamlStream) {
 		this.yamlStream = yamlStream;
 		this.yamlSpecification = null;
 	}
 
+	/**
+	 * Returns either the input stream given at construction or an input stream
+	 * found by looking up the YAML specification reference as a system resource
+	 * or as a local file
+	 * 
+	 * @return the input stream to use to load the YAML configuration
+	 */
 	private InputStream findInputStream() {
-		
+
 		if (yamlStream != null) {
 			return yamlStream;
 		}
-		
+
 		InputStream is = null;
 
 		// First attempt to see if it is a resource file
@@ -95,6 +120,9 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 		return is;
 	}
 
+	/**
+	 * Constructs the topology based on the YAML topology specification
+	 */
 	private void initializeTopology() {
 		InputStream is = null;
 		try {
