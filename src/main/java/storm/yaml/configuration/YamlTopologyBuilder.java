@@ -97,9 +97,7 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 
 			// Now build all the bolts
 			for (BoltSpecification spec : topoSpec.getBolts()) {
-				log.error("2. NAME NAME: " + spec.getName());
 				IRichBolt bolt = spec.create();
-				log.error("2.5 NAME NAME: " + spec.getName());
 				BoltDeclarer decl = setBolt(spec.getName(), bolt);
 				for (Map<String, Object> grouping : spec.getGroupings()) {
 					if (grouping.containsKey("shuffle")) {
@@ -108,7 +106,6 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 									(String) grouping.get("shuffle"),
 									(String) grouping.get("stream"));
 						} else {
-							log.error("SHUFFLE FROM " + grouping.get("shuffle"));
 							decl.shuffleGrouping((String) grouping
 									.get("shuffle"));
 						}

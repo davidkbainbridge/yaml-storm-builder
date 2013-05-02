@@ -85,7 +85,6 @@ public class NodeSpecification<T> {
 	 *            the name to set
 	 */
 	public void setName(String name) {
-		log.error("SET NAME: " + name);
 		this.name = name;
 	}
 
@@ -172,7 +171,6 @@ public class NodeSpecification<T> {
 			String className = pkg + '.' + implType + '.' + getType()
 					+ "Factory";
 			try {
-				log.error("LOOK: " + className);
 				clazz = (Class<? extends NodeFactory<T>>) Class
 						.forName(className);
 				factory = clazz.newInstance();
@@ -180,8 +178,6 @@ public class NodeSpecification<T> {
 				for (Map<String, Object> property : getProperties()) {
 					for (Entry<String, Object> entry : property.entrySet()) {
 						try {
-							log.error("PARAM: " + entry.getKey() + " = "
-									+ entry.getValue());
 							BeanUtils.setProperty(inst, entry.getKey(),
 									entry.getValue());
 						} catch (InvocationTargetException e) {
