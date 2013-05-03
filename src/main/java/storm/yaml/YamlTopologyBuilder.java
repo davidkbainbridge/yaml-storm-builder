@@ -62,6 +62,8 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 
 	private final String yamlSpecification;
 	private final InputStream yamlStream;
+	private TopologySpecification specification = null;
+	private boolean realized = false;
 
 	/**
 	 * Constructs a topology builder that will construct the topology based on
@@ -123,23 +125,28 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 	/**
 	 * Constructs the topology based on the YAML topology specification
 	 */
-	private void initializeTopology() {
+	public void realizeTopology() {
+		if (isRealized()) {
+			return;
+		}
+		
 		InputStream is = null;
 		try {
 			is = findInputStream();
 			Yaml yaml = new Yaml();
-			TopologySpecification topoSpec = yaml.loadAs(is,
+			specification = yaml.loadAs(is,
 					TopologySpecification.class);
 
+			setRealized(true);
 			// Now that we have the yaml parse we can walk the structure and
 			// build a topology based on that.
-			for (SpoutSpecification spec : topoSpec.getSpouts()) {
+			for (SpoutSpecification spec : specification.getSpouts()) {
 				IRichSpout spout = spec.create();
 				setSpout(spec.getName(), spout);
 			}
 
 			// Now build all the bolts
-			for (BoltSpecification spec : topoSpec.getBolts()) {
+			for (BoltSpecification spec : specification.getBolts()) {
 				IRichBolt bolt = spec.create();
 				BoltDeclarer decl = setBolt(spec.getName(), bolt);
 				for (Map<String, Object> grouping : spec.getGroupings()) {
@@ -174,8 +181,36 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 	@Override
 	public StormTopology createTopology() {
 		// Initialize the topology from the yaml specification
-		initializeTopology();
+		realizeTopology();
 
 		return super.createTopology();
+	}
+
+	/**
+	 * @return the realized
+	 */
+	public boolean isRealized() {
+		return realized;
+	}
+
+	/**
+	 * @param realized the realized to set
+	 */
+	public void setRealized(boolean realized) {
+		this.realized = realized;
+	}
+	
+	public String getName() {
+		if (!isRealized()) {
+			throw new IllegalStateException("Topology is not realized");
+		}
+		return specification.getName();
+	}
+	
+	public String getDescription() {
+		if (!isRealized()) {
+			throw new IllegalStateException("Topology is not realized");
+		}
+		return specification.getDescription();
 	}
 }

@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>yaml-storm-builder</groupId>
-	<artifactId>yaml-storm-builder</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>storm.yaml</groupId>
+	<artifactId>yaml-builder</artifactId>
+	<version>0.0.3-SNAPSHOT</version>
 
 	<properties>
 		<skip.sign>true</skip.sign>
@@ -82,14 +82,44 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.9</version>
-				<configuration>
-				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>zenoss-nexus-snapshot</id>
+			<name>Internal Zenoss Nexus Snapshots</name>
+			<url>http://cmrepo.zenoss.loc/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>zenoss-nexus-release</id>
+			<name>Internal Zenoss Nexus Releases</name>
+			<url>http://cmrepo.zenoss.loc/nexus/content/repositories/releases</url>
+		</repository>
+	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>clojars.org</id>
