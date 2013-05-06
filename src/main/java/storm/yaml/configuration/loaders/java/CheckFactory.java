@@ -29,94 +29,40 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration;
+package storm.yaml.configuration.loaders.java;
 
-import java.util.ArrayList;
-import java.util.List;
+import storm.yaml.TopologyCheck;
+import storm.yaml.configuration.NodeFactory;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public class TopologySpecification {
-	private String name = null;
-	private String description = null;
-	private List<CheckSpecification> checks = new ArrayList<CheckSpecification>();;
-	private List<SpoutSpecification> spouts = new ArrayList<SpoutSpecification>();
-	private List<BoltSpecification> bolts = new ArrayList<BoltSpecification>();
+public class CheckFactory extends NodeFactory<TopologyCheck> {
 
-	/**
-	 * @return the name
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see storm.yaml.configuration.NodeFactory#create(java.lang.String)
 	 */
-	public String getName() {
-		return name;
-	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public TopologyCheck create(String implClass) {
+		Class<? extends TopologyCheck> clazz;
+		try {
+			clazz = (Class<? extends TopologyCheck>) Class.forName(implClass);
+			return clazz.newInstance();
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	/**
-	 * @return the spouts
-	 */
-	public List<SpoutSpecification> getSpouts() {
-		return spouts;
-	}
-
-	/**
-	 * @param spouts
-	 *            the spouts to set
-	 */
-	public void setSpouts(List<SpoutSpecification> spouts) {
-		this.spouts = spouts;
-	}
-
-	/**
-	 * @return the bolts
-	 */
-	public List<BoltSpecification> getBolts() {
-		return bolts;
-	}
-
-	/**
-	 * @param bolts
-	 *            the bolts to set
-	 */
-	public void setBolts(List<BoltSpecification> bolts) {
-		this.bolts = bolts;
-	}
-
-	/**
-	 * @return the topologyChecks
-	 */
-	public List<CheckSpecification> getChecks() {
-		return checks;
-	}
-
-	/**
-	 * @param topologyChecks
-	 *            the topologyChecks to set
-	 */
-	public void setChecks(List<CheckSpecification> topologyChecks) {
-		this.checks = topologyChecks;
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -9,7 +9,7 @@ checks :
     impl : java:org.company.storm.nodes.MyTopologyCheck
     properties : 
       - test1 : hello
-        test2 : hello
+        test2 : world
 spouts :
   - name : random
     description: This spout will generate a random number on a specified interval

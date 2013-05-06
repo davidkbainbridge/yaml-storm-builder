@@ -37,6 +37,7 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import storm.yaml.UnableToCreateTopologyException;
 import storm.yaml.YamlTopologyBuilder;
 import backtype.storm.generated.StormTopology;
 
@@ -106,5 +107,16 @@ public class BuilderTest {
 				.get_componentId());
 		Assert.assertNotNull(topo.get_bolts().get("log_bolt").get_common()
 				.get_inputs().values().iterator().next().get_shuffle());
+	}
+
+	@Test
+	public void FailValidationTest() {
+		try {
+			StormTopology topo = new YamlTopologyBuilder("FailTopo.yml")
+					.createTopology();
+			Assert.fail("Test should have generated exception");
+		} catch (UnableToCreateTopologyException e) {
+			// If we get here, then the test passed.
+		}
 	}
 }

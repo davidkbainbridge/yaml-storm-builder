@@ -41,7 +41,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
+
 import storm.yaml.configuration.BoltSpecification;
+import storm.yaml.configuration.CheckSpecification;
 import storm.yaml.configuration.SpoutSpecification;
 import storm.yaml.configuration.TopologySpecification;
 import backtype.storm.generated.StormTopology;
@@ -58,12 +61,13 @@ import backtype.storm.topology.TopologyBuilder;
  */
 public class YamlTopologyBuilder extends TopologyBuilder {
 	private static final Logger log = LoggerFactory
-			.getLogger(TopologyBuilder.class);
+			.getLogger(YamlTopologyBuilder.class);
 
 	private final String yamlSpecification;
 	private final InputStream yamlStream;
 	private TopologySpecification specification = null;
 	private boolean realized = false;
+	private boolean valid = true;
 
 	/**
 	 * Constructs a topology builder that will construct the topology based on
@@ -122,33 +126,80 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 		return is;
 	}
 
+	public boolean validateTopology() {
+		for (CheckSpecification check : specification.getChecks()) {
+			TopologyCheck impl = check.create();
+			if (!impl.validateTopology()) {
+				log.error(String.format(
+						"Topology Validate Check Failed : [%s : %s]",
+						check.getName(), check.getDescription()));
+				return false;
+			}
+		}
+		log.info("Topology validation checks passed");
+		return true;
+	}
+
 	/**
 	 * Constructs the topology based on the YAML topology specification
 	 */
-	public void realizeTopology() {
+	public boolean realizeTopology() {
+		// If we are already realized, don't attempt to realize again
 		if (isRealized()) {
-			return;
+			return true;
 		}
-		
+
+		if (!isValid()) {
+			log.error("Attempt to realize an invalid topology builder, please see previous error messages in log");
+			return false;
+		}
+
 		InputStream is = null;
 		try {
 			is = findInputStream();
 			Yaml yaml = new Yaml();
-			specification = yaml.loadAs(is,
-					TopologySpecification.class);
+			specification = yaml.loadAs(is, TopologySpecification.class);
 
-			setRealized(true);
+			// Validate the topology
+			if (!validateTopology()) {
+				// If the topology did not validate that means something is not
+				// setup correctly. The validation check that failed should
+				// have already logged a message, so all we need to do is
+				// fail out.
+				specification = null;
+				return false;
+			}
+
+		} catch (Throwable t) {
+			// Something went wrong while attempting to load the YAML file,
+			// lot a message and return false
+			log.error("Unable to load the topology description", t);
+			return false;
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					log.warn("Unable to close topology specification", e);
+				}
+			}
+		}
+
+		boolean dirty = false;
+		try {
 			// Now that we have the yaml parse we can walk the structure and
 			// build a topology based on that.
 			for (SpoutSpecification spec : specification.getSpouts()) {
 				IRichSpout spout = spec.create();
 				setSpout(spec.getName(), spout);
+				dirty = true;
 			}
 
 			// Now build all the bolts
 			for (BoltSpecification spec : specification.getBolts()) {
 				IRichBolt bolt = spec.create();
 				BoltDeclarer decl = setBolt(spec.getName(), bolt);
+				dirty = true;
 				for (Map<String, Object> grouping : spec.getGroupings()) {
 					if (grouping.containsKey("shuffle")) {
 						if (grouping.containsKey("stream")) {
@@ -162,14 +213,24 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 					}
 				}
 			}
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					log.error("Unable to close topology specification", e);
-				}
+			setRealized(true);
+			return true;
+		} catch (Throwable t) {
+			if (dirty) {
+				// Something went horribly wrong, to the point that this
+				// topology builder is really no longer valid as either spouts
+				// or bolts have been added. Mark the builder as invalid to
+				// prevent unexpected things from happening.
+				specification = null;
+				setValid(false);
+			} else {
+				// Something went wrong, but the builder did not add any
+				// spouts or bolts, so it can be used again. Thus, while
+				// this realization failed the underling topology is still
+				// valid.
+				specification = null;
 			}
+			return false;
 		}
 	}
 
@@ -181,9 +242,12 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 	@Override
 	public StormTopology createTopology() {
 		// Initialize the topology from the yaml specification
-		realizeTopology();
-
-		return super.createTopology();
+		if (realizeTopology()) {
+			return super.createTopology();
+		} else {
+			throw new UnableToCreateTopologyException(
+					"Failure realizing topology");
+		}
 	}
 
 	/**
@@ -194,23 +258,39 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 	}
 
 	/**
-	 * @param realized the realized to set
+	 * @param realized
+	 *            the realized to set
 	 */
 	public void setRealized(boolean realized) {
 		this.realized = realized;
 	}
-	
+
 	public String getName() {
 		if (!isRealized()) {
 			throw new IllegalStateException("Topology is not realized");
 		}
 		return specification.getName();
 	}
-	
+
 	public String getDescription() {
 		if (!isRealized()) {
 			throw new IllegalStateException("Topology is not realized");
 		}
 		return specification.getDescription();
+	}
+
+	/**
+	 * @return the valid
+	 */
+	public boolean isValid() {
+		return valid;
+	}
+
+	/**
+	 * @param valid
+	 *            the valid to set
+	 */
+	private void setValid(boolean valid) {
+		this.valid = valid;
 	}
 }
