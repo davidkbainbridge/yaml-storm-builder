@@ -29,20 +29,25 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration.loaders.java;
+package storm.yaml.configuration.loaders.python;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 import storm.yaml.configuration.NodeFactory;
-
-import backtype.storm.topology.IRichSpout;
+import backtype.storm.topology.IRichBolt;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public class SpoutFactory extends NodeFactory<IRichSpout> {
+public class BoltFactory extends NodeFactory<IRichBolt> {
+
+	private static final Logger log = Logger.getLogger(SpoutFactory.class);
 
 	/*
 	 * (non-Javadoc)
@@ -51,23 +56,16 @@ public class SpoutFactory extends NodeFactory<IRichSpout> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public IRichSpout create(String implClass,
+	public IRichBolt create(String implClass,
 			List<Map<String, Object>> properties) {
-		Class<? extends IRichSpout> clazz;
-		try {
-			clazz = (Class<? extends IRichSpout>) Class.forName(implClass);
-			return clazz.newInstance();
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		log.debug(String.format("Creating Python wrapper for class %s",
+				implClass));
+		JSONObject jproperties = new JSONObject();
+		for (Map<String, Object> property : properties) {
+			for (Entry<String, Object> term : property.entrySet()) {
+				jproperties.put(term.getKey(), term.getValue());
+			}
 		}
-		return null;
+		return new PythonBoltWrapper(implClass, jproperties);
 	}
 }

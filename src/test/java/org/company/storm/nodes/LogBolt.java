@@ -74,8 +74,7 @@ public class LogBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-		// TODO Auto-generated method stub
-
+		log.debug(String.format(format, input.getValueByField(inputTag)));
 	}
 
 	/*

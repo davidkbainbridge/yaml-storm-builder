@@ -31,6 +31,9 @@
  */
 package storm.yaml.configuration.loaders.java;
 
+import java.util.List;
+import java.util.Map;
+
 import storm.yaml.configuration.NodeFactory;
 
 import backtype.storm.topology.IRichBolt;
@@ -48,7 +51,8 @@ public class BoltFactory extends NodeFactory<IRichBolt> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public IRichBolt create(String implClass) {
+	public IRichBolt create(String implClass,
+			List<Map<String, Object>> properties) {
 		Class<? extends IRichBolt> clazz;
 		try {
 			clazz = (Class<? extends IRichBolt>) Class.forName(implClass);

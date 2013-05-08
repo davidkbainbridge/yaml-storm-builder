@@ -216,6 +216,7 @@ public class YamlTopologyBuilder extends TopologyBuilder {
 			setRealized(true);
 			return true;
 		} catch (Throwable t) {
+			log.error("Unable to realize topology", t);
 			if (dirty) {
 				// Something went horribly wrong, to the point that this
 				// topology builder is really no longer valid as either spouts

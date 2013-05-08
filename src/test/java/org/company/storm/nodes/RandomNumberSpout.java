@@ -31,7 +31,11 @@
  */
 package org.company.storm.nodes;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +44,8 @@ import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
@@ -51,11 +57,15 @@ public class RandomNumberSpout extends BaseRichSpout {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(RandomNumberSpout.class);
+	private long msInterval = 0;
+	private long lastEmit = -1;
 
 	private int minimumValue = 0;
 	private int maximumValue = 100;
 	private String generateInterval = "5s";
 	private String outputTag = "number";
+	private Random rand = new Random();
+	private SpoutOutputCollector output = null;
 
 	/*
 	 * (non-Javadoc)
@@ -67,8 +77,40 @@ public class RandomNumberSpout extends BaseRichSpout {
 	@Override
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
-		// TODO Auto-generated method stub
+		output = collector;
+		parseGenerateInterval();
+	}
 
+	private void parseGenerateInterval() {
+		Pattern p = Pattern
+				.compile(
+						"([0-9]+d)?\\s*([0-9]+h)?\\s*([0-9]+m)?\\s*([0-9]+s)?\\s*([0-9]+ms)?",
+						Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(generateInterval);
+		m.matches();
+		msInterval = 0;
+		String part = null;
+		if ((part = m.group(1)) != null) {
+			msInterval += Integer
+					.parseInt(part.substring(0, part.length() - 1)) * 24 * 60 * 60;
+		}
+		if ((part = m.group(2)) != null) {
+			msInterval += Integer
+					.parseInt(part.substring(0, part.length() - 1)) * 60 * 60;
+		}
+		if ((part = m.group(3)) != null) {
+			msInterval += Integer
+					.parseInt(part.substring(0, part.length() - 1)) * 60;
+		}
+		if ((part = m.group(4)) != null) {
+			msInterval += Integer
+					.parseInt(part.substring(0, part.length() - 1));
+		}
+		msInterval *= 1000;
+		if ((part = m.group(5)) != null) {
+			msInterval += Integer
+					.parseInt(part.substring(0, part.length() - 2));
+		}
 	}
 
 	/*
@@ -78,8 +120,14 @@ public class RandomNumberSpout extends BaseRichSpout {
 	 */
 	@Override
 	public void nextTuple() {
-		// TODO Auto-generated method stub
+		if (lastEmit == -1 || new Date().getTime() - lastEmit >= msInterval) {
+			log.debug("EMIT");
 
+			output.emit(new Values(rand.nextInt(getMaximumValue()
+					- getMinimumValue())
+					+ getMinimumValue()));
+			lastEmit = new Date().getTime();
+		}
 	}
 
 	/*
@@ -91,8 +139,7 @@ public class RandomNumberSpout extends BaseRichSpout {
 	 */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
-
+		declarer.declare(new Fields(getOutputTag()));
 	}
 
 	/**
@@ -138,6 +185,7 @@ public class RandomNumberSpout extends BaseRichSpout {
 	 */
 	public void setGenerateInterval(String generateInterval) {
 		this.generateInterval = generateInterval;
+		parseGenerateInterval();
 	}
 
 	/**

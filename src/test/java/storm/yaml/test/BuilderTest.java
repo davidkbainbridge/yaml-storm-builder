@@ -35,10 +35,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import storm.yaml.UnableToCreateTopologyException;
 import storm.yaml.YamlTopologyBuilder;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 
 /**
@@ -118,5 +120,37 @@ public class BuilderTest {
 		} catch (UnableToCreateTopologyException e) {
 			// If we get here, then the test passed.
 		}
+	}
+
+	@Test
+	public void BuildPythonTopology() {
+		StormTopology topo = new YamlTopologyBuilder("PythonBoltTopo.yml")
+				.createTopology();
+		LocalCluster cluster = new LocalCluster();
+		cluster.submitTopology("foo", null, topo);
+
+		Object o = new Object();
+		synchronized (o) {
+			try {
+				o.wait(10 * 1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.err.println("KILL");
+		cluster.killTopology("foo");
+		System.err.println("SHUTDOWN");
+		cluster.shutdown();
+		System.err.println("WAIT");
+		synchronized (o) {
+			try {
+				o.wait(2 * 1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.err.println("ALL DONE");
 	}
 }

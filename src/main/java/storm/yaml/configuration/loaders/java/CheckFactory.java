@@ -31,6 +31,9 @@
  */
 package storm.yaml.configuration.loaders.java;
 
+import java.util.List;
+import java.util.Map;
+
 import storm.yaml.TopologyCheck;
 import storm.yaml.configuration.NodeFactory;
 
@@ -47,7 +50,8 @@ public class CheckFactory extends NodeFactory<TopologyCheck> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public TopologyCheck create(String implClass) {
+	public TopologyCheck create(String implClass,
+			List<Map<String, Object>> properties) {
 		Class<? extends TopologyCheck> clazz;
 		try {
 			clazz = (Class<? extends TopologyCheck>) Class.forName(implClass);

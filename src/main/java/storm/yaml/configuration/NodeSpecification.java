@@ -141,7 +141,8 @@ public class NodeSpecification<T> {
 	}
 
 	/**
-	 * @param groupings the groupings to set
+	 * @param groupings
+	 *            the groupings to set
 	 */
 	public void setGroupings(List<Map<String, Object>> groupings) {
 		this.groupings = groupings;
@@ -157,6 +158,7 @@ public class NodeSpecification<T> {
 		if ((idx = getImpl().indexOf(':')) == -1) {
 			implClass = getImpl();
 		} else {
+			implType = getImpl().substring(0, idx);
 			implClass = getImpl().substring(idx + 1);
 		}
 
@@ -171,10 +173,12 @@ public class NodeSpecification<T> {
 			String className = pkg + '.' + implType + '.' + getType()
 					+ "Factory";
 			try {
+				log.debug(String.format("Attempting to load class %s",
+						className));
 				clazz = (Class<? extends NodeFactory<T>>) Class
 						.forName(className);
 				factory = clazz.newInstance();
-				T inst = factory.create(implClass);
+				T inst = factory.create(implClass, getProperties());
 				for (Map<String, Object> property : getProperties()) {
 					for (Entry<String, Object> entry : property.entrySet()) {
 						try {

@@ -1,0 +1,54 @@
+---
+name : Sample Topology
+description : This is a sample topology definition in YAML so
+  that the topology creation is driven by a configuration file
+  as opposed to a block of Java code
+spouts :
+  - name : random
+    description: This spout will generate a random number on a specified interval
+    impl : java:org.company.storm.nodes.RandomNumberSpout
+    properties :
+      - minimumValue : 1
+        maximumValue : 100
+        generateInterval : 5s
+        outputTag : the_number
+#  - name : python_spout
+#    description : Sample python spout
+#    impl : python:SampleSpout.py
+#    properties :
+#      - outputTag : the_string
+bolts :
+  - name : python_bolt
+    description : Sample bolt in python
+    impl : python:SampleBolt.py
+    properties :
+      - inputTag : the_number
+      - outputTag : the_number
+    groupings :
+      - shuffle : random
+  - name : python_bolt2
+    description : Sample bolt in python
+    impl : python:SampleBolt.py
+    properties :
+      - inputTag : the_number
+      - outputTag : the_number2
+    groupings :
+      - shuffle : python_bolt
+  - name : log_bolt
+    description : Logs the input number
+    impl : java:org.company.storm.nodes.LogBolt
+    properties :
+      - format : The number is %d
+        inputTag : the_number2
+        outputTag : the_string
+    groupings :
+      - shuffle : python_bolt2
+#  - name : log_bolt2
+#    description : Logs the input number
+#    impl : java:org.company.storm.nodes.LogBolt
+#    properties :
+#      - format : The word is %s
+#        inputTag : the_string
+#        outputTag : the_string
+#    groupings :
+#      - shuffle : python_spout 

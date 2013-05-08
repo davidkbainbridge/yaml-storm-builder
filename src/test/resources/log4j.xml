@@ -29,6 +29,21 @@
 		<appender-ref ref="consoleAppender" />
 	</logger>
 
+	<logger name="python" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="consoleAppender" />
+	</logger>
+
+	<logger name="backtype.storm.task.ShellBolt" additivity="false">
+		<level value="info" />
+		<appender-ref ref="consoleAppender" />
+	</logger>
+
+	<logger name="storm.yaml.configuration.loaders.python" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="consoleAppender" />
+	</logger>
+
 	<root>
 		<level value="error" />
 		<appender-ref ref="consoleAppender" />

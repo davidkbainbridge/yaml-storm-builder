@@ -31,10 +31,14 @@
  */
 package storm.yaml.configuration;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
- *
+ * 
  */
 abstract public class NodeFactory<T> {
-	abstract public T create(String implClass);
+	abstract public T create(String implClass,
+			List<Map<String, Object>> properties);
 }

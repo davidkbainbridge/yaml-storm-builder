@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2013, Yaml Storm Builder Authors and/or its affiliates.
- * All rights reserved.
+ * Copyright (c) 2013, Zenoss and/or its affiliates. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -13,7 +12,7 @@
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
  *
- *   - Neither the name of Yaml Storm Builder or the names of its
+ *   - Neither the name of Zenoss or the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -29,45 +28,66 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration.loaders.java;
+package storm.yaml.configuration.loaders.python;
 
-import java.util.List;
 import java.util.Map;
 
-import storm.yaml.configuration.NodeFactory;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
+import backtype.storm.spout.ShellSpout;
 import backtype.storm.topology.IRichSpout;
+import backtype.storm.topology.OutputFieldsDeclarer;
 
 /**
- * @author David Bainbridge <davidk.bainbridge@gmail.com>
+ * @author David Bainbridge <dbainbridge@zenoss.com>
  * 
  */
-public class SpoutFactory extends NodeFactory<IRichSpout> {
+public class PythonSpoutWrapper extends ShellSpout implements IRichSpout {
+
+	private static final Logger log = Logger
+			.getLogger(PythonSpoutWrapper.class);
+	private static final long serialVersionUID = -8127962912877590627L;
+	private String source = null;
+	private JSONObject properties = null;
+
+	public PythonSpoutWrapper(String source, JSONObject properties) {
+		super("python", source);
+		// log = Logger.getLogger("python." + source);
+		this.source = source;
+		this.properties = properties;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public String getSource() {
+		return source;
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see storm.yaml.configuration.NodeFactory#create(java.lang.String)
+	 * @see
+	 * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm
+	 * .topology.OutputFieldsDeclarer)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public IRichSpout create(String implClass,
-			List<Map<String, Object>> properties) {
-		Class<? extends IRichSpout> clazz;
-		try {
-			clazz = (Class<? extends IRichSpout>) Class.forName(implClass);
-			return clazz.newInstance();
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		PythonWrapperHelper.declareOutputFields(declarer, source, properties,
+				"spout");
+		log.debug("DONE DECLARING OUTPUT FIELDS");
+	}
 
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see backtype.storm.topology.IComponent#getComponentConfiguration()
+	 */
+	@Override
+	public Map<String, Object> getComponentConfiguration() {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
 }
