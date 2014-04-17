@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration;
+package com.github.davidkbainbridge.storm.yaml.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NodeSpecification<T> {
 	public final static String LOADER_PACKAGE_LIST_PROPERTY = "storm.yaml.loader.package.list";
-	public final static String DEFAULT_LOADER_PACKAGE_LIST = "storm.yaml.configuration.loaders";
+	public final static String DEFAULT_LOADER_PACKAGE_LIST = "com.github.davidkbainbridge.storm.yaml.configuration.loaders";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(NodeSpecification.class);

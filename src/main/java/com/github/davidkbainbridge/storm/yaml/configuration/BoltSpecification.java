@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Yaml Storm Builder Authors  and/or its affiliates.
+ * Copyright (c) 2013, Yaml Storm Builder Authors and/or its affiliates.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
  *
- *   - Neither the name of Yaml Storm Builder Authors or the names of its
+ *   - Neither the name of Yaml Storm Builder or the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -29,25 +29,17 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml;
+package com.github.davidkbainbridge.storm.yaml.configuration;
+
+import backtype.storm.topology.IRichBolt;
+
 
 /**
- * Implementations of this interface can be used as pre-checks for a topology
- * realization / creation to validate existence / connectivity to external
- * system, data availability, etc. before a topology is realized.
- * 
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public interface TopologyCheck {
-	/**
-	 * Used as pre-checks for a topology realization / creation to validate
-	 * existence / connectivity to external system, data availability, etc.
-	 * before a topology is realized.
-	 * 
-	 * @return Returns true if the topology the realization of the topology
-	 *         should continue. If false is return the topology will not be
-	 *         realized.
-	 */
-	public boolean validateTopology();
+public class BoltSpecification extends NodeSpecification<IRichBolt> {
+	public BoltSpecification() {
+		super("Bolt");
+	}
 }

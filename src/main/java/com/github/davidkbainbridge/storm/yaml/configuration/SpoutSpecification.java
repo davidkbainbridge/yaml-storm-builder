@@ -29,45 +29,16 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration.loaders.java;
+package com.github.davidkbainbridge.storm.yaml.configuration;
 
-import java.util.List;
-import java.util.Map;
-
-import storm.yaml.configuration.NodeFactory;
-
-import backtype.storm.topology.IRichBolt;
+import backtype.storm.topology.IRichSpout;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public class BoltFactory extends NodeFactory<IRichBolt> {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see storm.yaml.configuration.NodeFactory#create(java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public IRichBolt create(String implClass,
-			List<Map<String, Object>> properties) {
-		Class<? extends IRichBolt> clazz;
-		try {
-			clazz = (Class<? extends IRichBolt>) Class.forName(implClass);
-			return clazz.newInstance();
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+public class SpoutSpecification extends NodeSpecification<IRichSpout> {
+	public SpoutSpecification() {
+		super("Spout");
 	}
 }

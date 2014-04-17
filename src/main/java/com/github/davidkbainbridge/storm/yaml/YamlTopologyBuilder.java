@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml;
+package com.github.davidkbainbridge.storm.yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,10 +43,10 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 
-import storm.yaml.configuration.BoltSpecification;
-import storm.yaml.configuration.CheckSpecification;
-import storm.yaml.configuration.SpoutSpecification;
-import storm.yaml.configuration.TopologySpecification;
+import com.github.davidkbainbridge.storm.yaml.configuration.BoltSpecification;
+import com.github.davidkbainbridge.storm.yaml.configuration.CheckSpecification;
+import com.github.davidkbainbridge.storm.yaml.configuration.SpoutSpecification;
+import com.github.davidkbainbridge.storm.yaml.configuration.TopologySpecification;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.IRichBolt;

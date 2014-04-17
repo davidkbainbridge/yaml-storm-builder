@@ -32,7 +32,7 @@ package org.company.storm.nodes;
 
 import org.apache.log4j.Logger;
 
-import storm.yaml.TopologyCheck;
+import com.github.davidkbainbridge.storm.yaml.TopologyCheck;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>

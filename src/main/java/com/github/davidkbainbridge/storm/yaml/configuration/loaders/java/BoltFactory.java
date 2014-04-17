@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2013, Yaml Storm Builder Authors and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013, Yaml Storm Builder Authors and/or its affiliates.
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -12,7 +13,7 @@
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
  *
- *   - Neither the name of Yaml Storm Builder Authors or the names of its
+ *   - Neither the name of Yaml Storm Builder or the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -28,20 +29,45 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml;
+package com.github.davidkbainbridge.storm.yaml.configuration.loaders.java;
+
+import java.util.List;
+import java.util.Map;
+
+import com.github.davidkbainbridge.storm.yaml.configuration.NodeFactory;
+
+import backtype.storm.topology.IRichBolt;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
- *
+ * 
  */
-public class UnableToCreateTopologyException extends RuntimeException {
-	private static final long serialVersionUID = 7145286717962656770L;
-	
-	public UnableToCreateTopologyException() {
-		super();
-	}
-	
-	public UnableToCreateTopologyException(String message) {
-		super(message);
+public class BoltFactory extends NodeFactory<IRichBolt> {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see storm.yaml.configuration.NodeFactory#create(java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public IRichBolt create(String implClass,
+			List<Map<String, Object>> properties) {
+		Class<? extends IRichBolt> clazz;
+		try {
+			clazz = (Class<? extends IRichBolt>) Class.forName(implClass);
+			return clazz.newInstance();
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

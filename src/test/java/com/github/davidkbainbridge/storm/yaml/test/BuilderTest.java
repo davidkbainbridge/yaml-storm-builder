@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.test;
+package com.github.davidkbainbridge.storm.yaml.test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,8 +38,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import storm.yaml.UnableToCreateTopologyException;
-import storm.yaml.YamlTopologyBuilder;
+import com.github.davidkbainbridge.storm.yaml.UnableToCreateTopologyException;
+import com.github.davidkbainbridge.storm.yaml.YamlTopologyBuilder;
 import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 

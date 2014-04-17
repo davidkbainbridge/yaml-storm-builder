@@ -29,16 +29,43 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration;
-
-import backtype.storm.topology.IRichSpout;
+package com.github.davidkbainbridge.storm.yaml.configuration;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public class SpoutSpecification extends NodeSpecification<IRichSpout> {
-	public SpoutSpecification() {
-		super("Spout");
+abstract public class NodeParameter {
+	private String name = null;
+	private Object value = null;
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the value
+	 */
+	public Object getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	public void setValue(Object value) {
+		this.value = value;
 	}
 }

@@ -28,7 +28,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration.loaders.python;
+package com.github.davidkbainbridge.storm.yaml.configuration.loaders.python;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,31 +45,63 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import backtype.storm.task.ShellBolt;
+import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
 /**
  * @author David Bainbridge <dbainbridge@zenoss.com>
+ * @param <prop>
  * 
  */
-public class PythonWrapperHelper {
-	private static final Logger log = Logger
-			.getLogger(PythonWrapperHelper.class);
+public class PythonBoltWrapper extends ShellBolt implements IRichBolt {
 
-	public static final void declareOutputFields(OutputFieldsDeclarer declarer,
-			String source, JSONObject properties, String type) {
+	private static final long serialVersionUID = -8698950988917179032L;
+	private static final Logger log = Logger.getLogger(PythonBoltWrapper.class);
+
+	private String source = null;
+	private JSONObject properties = null;
+
+	public PythonBoltWrapper(String source, JSONObject properties) {
+		super("python", source, properties.toString());
+		// log = Logger.getLogger("python." + source);
+		this.source = source;
+		this.properties = properties;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public String getSource() {
+		return source;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm
+	 * .topology.OutputFieldsDeclarer)
+	 */
+	@Override
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		PythonWrapperHelper.declareOutputFields(declarer, source, properties,
+				"bolt");
+	}
+
+	public void declareOutputFieldss(OutputFieldsDeclarer declarer) {
 		Process process = null;
 		try {
-			log.debug(String.format(
-					"Create subprocess to get output fields for %s '%s'",
-					type, source));
+			log.debug(String
+					.format("Create subprocess to get output fields for Python bolt '%s'",
+							source));
 			String[] cmd = { "python", "-u", "-B" };
 			ProcessBuilder pb = new ProcessBuilder(cmd);
 			URL url = ClassLoader.getSystemResource("resources/" + source);
 			if (url == null) {
 				throw new RuntimeException(String.format(
-						"Unable to locate Python %s for source '%s'", type,
-						source));
+						"Unable to locate Python bolt for source '%s'", source));
 			}
 			String name = source.substring(0, source.lastIndexOf('.'));
 			log.debug(String.format("Assume class name is '%s'", name));
@@ -92,18 +124,17 @@ public class PythonWrapperHelper {
 			int c = io.read();
 			byte[] buf = new byte[1024];
 			int cnt = 0;
+
 			if (c > 0) {
 				baos.write((byte) c);
 				while ((cnt = io.read(buf)) > 0) {
 					baos.write(buf, 0, cnt);
 				}
 				log.error(String
-						.format("Fatel error attempting to retrieve declared output fields from Python %s: '%s'\n",
-								type, baos.toString()));
+						.format("Fatel error attempting to retrieve declared output fields from Python bolt: %s\n",
+								baos.toString()));
 				throw new RuntimeException(
-						String.format(
-								"Failed to retrieve declared output fields from Python %s",
-								type));
+						"Failed to retrieve declared output fields from Python bolt");
 			} else {
 				// Check stdout
 				io = process.getInputStream();
@@ -125,17 +156,28 @@ public class PythonWrapperHelper {
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (IOException e) {
-			throw new RuntimeException(String.format(
-					"Failed to retrieve declared output fields from Python %s",
-					type), e);
+			throw new RuntimeException(
+					"Failed to retrieve declared output fields from Python bolt",
+					e);
 		} catch (URISyntaxException e) {
-			throw new RuntimeException(String.format(
-					"Failed to retrieve declared output fields from Python %s",
-					type), e);
+			throw new RuntimeException(
+					"Failed to retrieve declared output fields from Python bolt",
+					e);
 		} finally {
 			if (process != null) {
 				process.destroy();
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see backtype.storm.topology.IComponent#getComponentConfiguration()
+	 */
+	@Override
+	public Map<String, Object> getComponentConfiguration() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

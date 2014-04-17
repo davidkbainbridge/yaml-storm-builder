@@ -13,7 +13,7 @@
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
  *
- *   - Neither the name of Yaml Storm Builder or the names of its
+ *   - Neither the name of Yaml Storm Builder Authors or the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -29,44 +29,16 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration.loaders.java;
+package com.github.davidkbainbridge.storm.yaml.configuration;
 
-import java.util.List;
-import java.util.Map;
-
-import storm.yaml.TopologyCheck;
-import storm.yaml.configuration.NodeFactory;
+import com.github.davidkbainbridge.storm.yaml.TopologyCheck;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public class CheckFactory extends NodeFactory<TopologyCheck> {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see storm.yaml.configuration.NodeFactory#create(java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public TopologyCheck create(String implClass,
-			List<Map<String, Object>> properties) {
-		Class<? extends TopologyCheck> clazz;
-		try {
-			clazz = (Class<? extends TopologyCheck>) Class.forName(implClass);
-			return clazz.newInstance();
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+public class CheckSpecification extends NodeSpecification<TopologyCheck> {
+	public CheckSpecification() {
+		super("Check");
 	}
 }

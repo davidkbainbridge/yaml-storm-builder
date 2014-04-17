@@ -29,17 +29,44 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration;
+package com.github.davidkbainbridge.storm.yaml.configuration.loaders.java;
 
-import backtype.storm.topology.IRichBolt;
+import java.util.List;
+import java.util.Map;
 
+import com.github.davidkbainbridge.storm.yaml.TopologyCheck;
+import com.github.davidkbainbridge.storm.yaml.configuration.NodeFactory;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-public class BoltSpecification extends NodeSpecification<IRichBolt> {
-	public BoltSpecification() {
-		super("Bolt");
+public class CheckFactory extends NodeFactory<TopologyCheck> {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see storm.yaml.configuration.NodeFactory#create(java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public TopologyCheck create(String implClass,
+			List<Map<String, Object>> properties) {
+		Class<? extends TopologyCheck> clazz;
+		try {
+			clazz = (Class<? extends TopologyCheck>) Class.forName(implClass);
+			return clazz.newInstance();
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

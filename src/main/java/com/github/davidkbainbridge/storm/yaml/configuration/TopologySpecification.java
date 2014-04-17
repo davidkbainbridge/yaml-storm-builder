@@ -29,15 +29,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration;
+package com.github.davidkbainbridge.storm.yaml.configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author David Bainbridge <davidk.bainbridge@gmail.com>
  * 
  */
-abstract public class NodeParameter {
+public class TopologySpecification {
 	private String name = null;
-	private Object value = null;
+	private String description = null;
+	private List<CheckSpecification> checks = new ArrayList<CheckSpecification>();;
+	private List<SpoutSpecification> spouts = new ArrayList<SpoutSpecification>();
+	private List<BoltSpecification> bolts = new ArrayList<BoltSpecification>();
 
 	/**
 	 * @return the name
@@ -55,17 +61,62 @@ abstract public class NodeParameter {
 	}
 
 	/**
-	 * @return the value
+	 * @return the description
 	 */
-	public Object getValue() {
-		return value;
+	public String getDescription() {
+		return description;
 	}
 
 	/**
-	 * @param value
-	 *            the value to set
+	 * @param description
+	 *            the description to set
 	 */
-	public void setValue(Object value) {
-		this.value = value;
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the spouts
+	 */
+	public List<SpoutSpecification> getSpouts() {
+		return spouts;
+	}
+
+	/**
+	 * @param spouts
+	 *            the spouts to set
+	 */
+	public void setSpouts(List<SpoutSpecification> spouts) {
+		this.spouts = spouts;
+	}
+
+	/**
+	 * @return the bolts
+	 */
+	public List<BoltSpecification> getBolts() {
+		return bolts;
+	}
+
+	/**
+	 * @param bolts
+	 *            the bolts to set
+	 */
+	public void setBolts(List<BoltSpecification> bolts) {
+		this.bolts = bolts;
+	}
+
+	/**
+	 * @return the topologyChecks
+	 */
+	public List<CheckSpecification> getChecks() {
+		return checks;
+	}
+
+	/**
+	 * @param topologyChecks
+	 *            the topologyChecks to set
+	 */
+	public void setChecks(List<CheckSpecification> topologyChecks) {
+		this.checks = topologyChecks;
 	}
 }

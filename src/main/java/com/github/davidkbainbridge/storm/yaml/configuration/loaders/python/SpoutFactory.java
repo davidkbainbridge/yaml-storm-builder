@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package storm.yaml.configuration.loaders.python;
+package com.github.davidkbainbridge.storm.yaml.configuration.loaders.python;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
-import storm.yaml.configuration.NodeFactory;
+import com.github.davidkbainbridge.storm.yaml.configuration.NodeFactory;
 import backtype.storm.topology.IRichSpout;
 
 /**
